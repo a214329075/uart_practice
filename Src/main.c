@@ -45,7 +45,7 @@
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
-UART_HandleTypeDef huart4;
+UART_HandleTypeDef huart6;
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
@@ -55,7 +55,7 @@ UART_HandleTypeDef huart4;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_UART4_Init(void);
+static void MX_USART6_UART_Init(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
@@ -63,6 +63,8 @@ static void MX_UART4_Init(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
+
+  uint8_t UART_RxBuffer[2048];
 
 /* USER CODE END 0 */
 
@@ -74,6 +76,8 @@ static void MX_UART4_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+	
+	
 
   /* USER CODE END 1 */
 
@@ -95,8 +99,24 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_UART4_Init();
+  MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
+	uint8_t tbuf[1]={0};
+		int* r_data;
+	  HAL_StatusTypeDef uart_state;
+		__HAL_UART_ENABLE_IT(&huart6, UART_IT_RXNE);
+		HAL_UART_Receive_IT(&huart6,UART_RxBuffer,2048); 
+		HAL_UART_Transmit_IT(&huart6,UART_RxBuffer,2048); 
+	
+	HAL_StatusTypeDef HAL_STATE;
+	HAL_GPIO_WritePin (GPIOG, GPIO_PIN_1, 1);
+	HAL_GPIO_WritePin (GPIOG, GPIO_PIN_2, 1);
+	HAL_GPIO_WritePin (GPIOG, GPIO_PIN_3, 1);
+	HAL_GPIO_WritePin (GPIOG, GPIO_PIN_4, 1);
+	HAL_GPIO_WritePin (GPIOG, GPIO_PIN_5, 1);
+	HAL_GPIO_WritePin (GPIOG, GPIO_PIN_6, 1);
+	HAL_GPIO_WritePin (GPIOG, GPIO_PIN_7, 1);
+	HAL_GPIO_WritePin (GPIOG, GPIO_PIN_8, 1);
 
   /* USER CODE END 2 */
 
@@ -104,15 +124,53 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+		HAL_GPIO_WritePin(GPIOG, GPIO_PIN_9, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOG, GPIO_PIN_14, GPIO_PIN_SET);
+		HAL_UART_Receive(&huart6, (uint8_t *) tbuf , sizeof (tbuf), HAL_MAX_DELAY);
+		
+		if (tbuf[0] == '1')
+		{
+			HAL_GPIO_WritePin (GPIOG, GPIO_PIN_1,0);
+			HAL_GPIO_WritePin (GPIOG, GPIO_PIN_2, 1);
+			HAL_GPIO_WritePin (GPIOG, GPIO_PIN_3, 1);
+			HAL_GPIO_WritePin (GPIOG, GPIO_PIN_4, 1);
+			HAL_GPIO_WritePin (GPIOG, GPIO_PIN_5, 1);
+			HAL_GPIO_WritePin (GPIOG, GPIO_PIN_6, 1);
+			HAL_GPIO_WritePin (GPIOG, GPIO_PIN_7, 1);
+			HAL_GPIO_WritePin (GPIOG, GPIO_PIN_8, 1);
+			HAL_Delay(50);
+		}
+		
+				if (tbuf[0] == '2')
+		{
+			HAL_GPIO_WritePin (GPIOG, GPIO_PIN_1,1);
+			HAL_GPIO_WritePin (GPIOG, GPIO_PIN_2, 0);
+			HAL_GPIO_WritePin (GPIOG, GPIO_PIN_3, 1);
+			HAL_GPIO_WritePin (GPIOG, GPIO_PIN_4, 1);
+			HAL_GPIO_WritePin (GPIOG, GPIO_PIN_5, 1);
+			HAL_GPIO_WritePin (GPIOG, GPIO_PIN_6, 1);
+			HAL_GPIO_WritePin (GPIOG, GPIO_PIN_7, 1);
+			HAL_GPIO_WritePin (GPIOG, GPIO_PIN_8, 1);
+			HAL_Delay(50);
+		}
+		
+		
+		HAL_UART_Transmit(&huart6, (uint8_t *)tbuf, (sizeof(tbuf)), HAL_MAX_DELAY);
+	}
 
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
+		
+		
+
+		
+		
 
   }
   /* USER CODE END 3 */
 
-}
+
 
 /**
   * @brief System Clock Configuration
@@ -167,19 +225,19 @@ void SystemClock_Config(void)
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }
 
-/* UART4 init function */
-static void MX_UART4_Init(void)
+/* USART6 init function */
+static void MX_USART6_UART_Init(void)
 {
 
-  huart4.Instance = UART4;
-  huart4.Init.BaudRate = 115200;
-  huart4.Init.WordLength = UART_WORDLENGTH_8B;
-  huart4.Init.StopBits = UART_STOPBITS_1;
-  huart4.Init.Parity = UART_PARITY_NONE;
-  huart4.Init.Mode = UART_MODE_TX_RX;
-  huart4.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart4.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart4) != HAL_OK)
+  huart6.Instance = USART6;
+  huart6.Init.BaudRate = 115200;
+  huart6.Init.WordLength = UART_WORDLENGTH_8B;
+  huart6.Init.StopBits = UART_STOPBITS_1;
+  huart6.Init.Parity = UART_PARITY_NONE;
+  huart6.Init.Mode = UART_MODE_TX_RX;
+  huart6.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart6.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart6) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
@@ -199,7 +257,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct;
 
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
   __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOF_CLK_ENABLE();
